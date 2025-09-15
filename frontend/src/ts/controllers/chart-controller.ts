@@ -32,7 +32,6 @@ import chartAnnotation, {
 } from "chartjs-plugin-annotation";
 import chartTrendline from "chartjs-plugin-trendline";
 import { get as getTypingSpeedUnit } from "../utils/typing-speed-units";
-import * as ActivePage from "../states/active-page";
 
 Chart.register(
   BarController,
@@ -1434,7 +1433,7 @@ export function updateAllChartColors(): void {
 }
 
 ConfigEvent.subscribe((eventKey, eventValue) => {
-  if (eventKey === "accountChart" && ActivePage.get() === "account") {
+  if (eventKey === "accountChart") {
     updateResults();
     updateAccuracy();
     updateAverage10();

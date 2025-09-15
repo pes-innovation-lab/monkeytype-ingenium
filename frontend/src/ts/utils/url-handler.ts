@@ -8,7 +8,6 @@ import * as CustomText from "../test/custom-text";
 import Ape from "../ape";
 import * as DB from "../db";
 import * as Loader from "../elements/loader";
-import * as AccountButton from "../elements/account-button";
 import { restart as restartTest } from "../test/test-logic";
 import * as ChallengeController from "../controllers/challenge-controller";
 import {
@@ -71,7 +70,6 @@ export async function linkDiscord(hashOverride: string): Promise<void> {
     }
 
     DB.setSnapshot(snapshot);
-    AccountButton.updateAvatar(snapshot);
   }
 }
 

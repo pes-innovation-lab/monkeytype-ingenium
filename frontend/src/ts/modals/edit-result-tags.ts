@@ -2,7 +2,6 @@ import Ape from "../ape";
 import * as DB from "../db";
 import * as Loader from "../elements/loader";
 import * as Notifications from "../elements/notifications";
-import * as AccountPage from "../pages/account";
 import * as ConnectionState from "../states/connection";
 import { areUnsortedArraysEqual } from "../utils/arrays";
 import * as TestResult from "../test/result";
@@ -141,9 +140,7 @@ async function save(): Promise<void> {
     }
   });
 
-  if (state.source === "accountPage") {
-    AccountPage.updateTagsForResult(state.resultId, state.tags);
-  } else if (state.source === "resultPage") {
+  if (state.source === "resultPage") {
     TestResult.updateTagsAfterEdit(state.tags, responseTagPbs);
   }
 }

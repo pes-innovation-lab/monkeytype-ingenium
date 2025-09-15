@@ -3,7 +3,6 @@ import * as SoundController from "../controllers/sound-controller";
 import * as TestLogic from "../test/test-logic";
 import { getLanguageDisplayString } from "../utils/strings";
 import * as ModesNotice from "../elements/modes-notice";
-import { isAuthenticated } from "../firebase";
 import * as ManualRestart from "../test/manual-restart-tracker";
 import { areUnsortedArraysEqual } from "../utils/arrays";
 import Config from "../config";
@@ -155,12 +154,6 @@ export const commandlineConfigMetadata: CommandlineConfigMetadataObject = {
     subgroup: {
       options: [[0, 1, 2, 3], [0], [1], [2], [3], [-3]],
       configValueMode: () => "include",
-      isAvailable: (value) => {
-        if (value[0] === -3) {
-          return isAuthenticated;
-        }
-        return undefined;
-      },
       display: (value) => {
         if (areUnsortedArraysEqual(value, [0, 1, 2, 3])) {
           return "all";
@@ -675,8 +668,6 @@ export const commandlineConfigMetadata: CommandlineConfigMetadataObject = {
   randomTheme: {
     subgroup: {
       options: "fromSchema",
-      isAvailable: (value) =>
-        value === "custom" ? isAuthenticated : undefined,
     },
   },
 

@@ -1,6 +1,5 @@
 import { formatDistanceToNowStrict } from "date-fns/formatDistanceToNowStrict";
 import Ape from "../ape";
-import { isAuthenticated } from "../firebase";
 import * as DB from "../db";
 import * as NotificationEvent from "../observables/notification-event";
 import * as BadgeController from "../controllers/badge-controller";
@@ -8,11 +7,8 @@ import * as Notifications from "../elements/notifications";
 import * as ConnectionState from "../states/connection";
 import { escapeHTML } from "../utils/misc";
 import AnimatedModal from "../utils/animated-modal";
-import { updateXp as accountPageUpdateProfile } from "./profile";
 import { MonkeyMail } from "@monkeytype/schemas/users";
 import * as XPBar from "../elements/xp-bar";
-import * as AuthEvent from "../observables/auth-event";
-import * as ActivePage from "../states/active-page";
 
 let accountAlerts: MonkeyMail[] = [];
 let maxMail = 0;
@@ -96,11 +92,6 @@ function hide(): void {
         const snapxp = DB.getSnapshot()?.xp ?? 0;
         void XPBar.update(snapxp, totalXpClaimed);
 
-        const activePage = ActivePage.get();
-        if (activePage === "account" || activePage === "profile") {
-          accountPageUpdateProfile(activePage, snapxp + totalXpClaimed, true);
-        }
-
         DB.addXp(totalXpClaimed);
       }
     },
@@ -110,15 +101,10 @@ function hide(): void {
 async function show(): Promise<void> {
   void modal.show({
     beforeAnimation: async () => {
-      if (isAuthenticated()) {
-        $("#alertsPopup .accountAlerts").removeClass("hidden");
-        $("#alertsPopup .separator.accountSeparator").removeClass("hidden");
-        $("#alertsPopup .accountAlerts .list").html(`
-          <div class="preloader"><i class="fas fa-fw fa-spin fa-circle-notch"></i></div>`);
-      } else {
-        $("#alertsPopup .accountAlerts").addClass("hidden");
-        $("#alertsPopup .separator.accountSeparator").addClass("hidden");
-      }
+      $("#alertsPopup .accountAlerts").removeClass("hidden");
+      $("#alertsPopup .separator.accountSeparator").removeClass("hidden");
+      $("#alertsPopup .accountAlerts .list").html(`
+        <div class="preloader"><i class="fas fa-fw fa-spin fa-circle-notch"></i></div>`);
 
       accountAlerts = [];
       mailToDelete = [];
@@ -128,9 +114,7 @@ async function show(): Promise<void> {
       fillPSAs();
     },
     afterAnimation: async () => {
-      if (isAuthenticated()) {
-        void getAccountAlerts();
-      }
+      void getAccountAlerts();
     },
   });
 }
@@ -392,20 +376,6 @@ NotificationEvent.subscribe((message, level, customTitle) => {
   });
   if (state.notifications.length > 25) {
     state.notifications.shift();
-  }
-});
-
-AuthEvent.subscribe((event) => {
-  if (event.type === "snapshotUpdated" && event.data.isInitial) {
-    const snapshot = DB.getSnapshot();
-    setNotificationBubbleVisible((snapshot?.inboxUnreadSize ?? 0) > 0);
-  }
-  if (event.type === "authStateChanged" && !event.data.isUserSignedIn) {
-    setNotificationBubbleVisible(false);
-    accountAlerts = [];
-    mailToMarkRead = [];
-    mailToDelete = [];
-    $("#alertsPopup .accountAlerts .list").empty();
   }
 });
 

@@ -1,7 +1,6 @@
 import * as Loader from "../elements/loader";
 import * as Replay from "./replay";
 import * as Misc from "../utils/misc";
-import { isAuthenticated } from "../firebase";
 import { getActiveFunboxesWithFunction } from "./funbox/list";
 import * as DB from "../db";
 import * as ThemeColors from "../elements/theme-colors";
@@ -34,9 +33,6 @@ function revert(): void {
   $(".highlightContainer").removeClass("hidden");
   if (revertCookie) $("#cookiesModal").removeClass("hidden");
   if (revealReplay) $("#resultReplay").removeClass("hidden");
-  if (!isAuthenticated()) {
-    $(".pageTest .loginTip").removeClass("hidden");
-  }
   (document.querySelector("html") as HTMLElement).style.scrollBehavior =
     "smooth";
   for (const fb of getActiveFunboxesWithFunction("applyGlobalCSS")) {

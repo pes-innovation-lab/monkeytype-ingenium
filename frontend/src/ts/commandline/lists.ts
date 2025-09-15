@@ -1,6 +1,6 @@
 import MinBurstCommands from "./lists/min-burst";
 import BailOutCommands from "./lists/bail-out";
-import QuoteFavoriteCommands from "./lists/quote-favorites";
+//import QuoteFavoriteCommands from "./lists/quote-favorites";
 import ResultSavingCommands from "./lists/result-saving";
 import NavigationCommands from "./lists/navigation";
 import ResultScreenCommands from "./lists/result-screen";
@@ -91,7 +91,6 @@ export const commands: CommandsSubgroup = {
       },
       shouldFocusTestUI: false,
     },
-    ...QuoteFavoriteCommands,
     ...BailOutCommands,
     {
       id: "shareTestSettings",

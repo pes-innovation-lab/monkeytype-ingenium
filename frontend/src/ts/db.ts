@@ -1,6 +1,5 @@
 import Ape from "./ape";
 import * as Notifications from "./elements/notifications";
-import { isAuthenticated } from "./firebase";
 import * as ConnectionState from "./states/connection";
 import { lastElementFromArray } from "./utils/arrays";
 import { migrateConfig } from "./utils/config";
@@ -49,6 +48,14 @@ export function getSnapshot(): Snapshot | undefined {
   return dbSnapshot;
 }
 
+export function initDefaultSnapshot(): void {
+  // Initialize a default snapshot for no-auth mode
+  if (!dbSnapshot) {
+    dbSnapshot = getDefaultSnapshot();
+    AuthEvent.dispatch({ type: "snapshotUpdated", data: { isInitial: true } });
+  }
+}
+
 export function setSnapshot(newSnapshot: Snapshot | undefined): void {
   const originalBanned = dbSnapshot?.banned;
   const originalVerified = dbSnapshot?.verified;
@@ -78,8 +85,6 @@ export async function initSnapshot(): Promise<Snapshot | false> {
   //send api request with token that returns tags, presets, and data needed for snap
   const snap = getDefaultSnapshot();
   try {
-    if (!isAuthenticated()) return false;
-
     const [userResponse, configResponse, presetsResponse] = await Promise.all([
       Ape.users.get(),
       Ape.configs.get(),
@@ -253,8 +258,6 @@ export async function initSnapshot(): Promise<Snapshot | false> {
 }
 
 export async function getUserResults(offset?: number): Promise<boolean> {
-  if (!isAuthenticated()) return false;
-
   if (!dbSnapshot) return false;
   if (
     dbSnapshot.results !== undefined &&
@@ -275,7 +278,6 @@ export async function getUserResults(offset?: number): Promise<boolean> {
   }
 
   //another check in case user logs out while waiting for response
-  if (!isAuthenticated()) return false;
 
   const results: SnapshotResult<Mode>[] = response.body.data.map((result) => {
     if (result.bailedOut === undefined) result.bailedOut = false;
@@ -359,7 +361,6 @@ export async function editCustomTheme(
   themeId: string,
   newTheme: Omit<CustomTheme, "_id">
 ): Promise<boolean> {
-  if (!isAuthenticated()) return false;
   if (!dbSnapshot) return false;
 
   if (dbSnapshot.customThemes === undefined) {
@@ -398,7 +399,6 @@ export async function editCustomTheme(
 }
 
 export async function deleteCustomTheme(themeId: string): Promise<boolean> {
-  if (!isAuthenticated()) return false;
   if (!dbSnapshot) return false;
 
   const customTheme = dbSnapshot.customThemes?.find((t) => t._id === themeId);
@@ -904,22 +904,12 @@ export async function updateLbMemory<M extends Mode>(
   }
 }
 
-export async function saveConfig(config: Partial<Config>): Promise<void> {
-  if (isAuthenticated()) {
-    const response = await Ape.configs.save({ body: config });
-    if (response.status !== 200) {
-      Notifications.add("Failed to save config: " + response.body.message, -1);
-    }
-  }
+export async function saveConfig(_config: Partial<Config>): Promise<void> {
+  // Authentication removed - config saving disabled
 }
 
 export async function resetConfig(): Promise<void> {
-  if (isAuthenticated()) {
-    const response = await Ape.configs.delete();
-    if (response.status !== 200) {
-      Notifications.add("Failed to reset config: " + response.body.message, -1);
-    }
-  }
+  // Authentication removed - config reset disabled
 }
 
 export function saveLocalResult(result: SnapshotResult<Mode>): void {
@@ -1004,7 +994,7 @@ export function setStreak(streak: number): void {
 export async function getTestActivityCalendar(
   yearString: string
 ): Promise<TestActivityCalendar | undefined> {
-  if (!isAuthenticated() || dbSnapshot === undefined) return undefined;
+  if (dbSnapshot === undefined) return undefined;
 
   if (yearString === "current") return dbSnapshot.testActivity;
 

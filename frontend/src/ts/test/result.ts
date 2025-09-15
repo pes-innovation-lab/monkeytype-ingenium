@@ -8,7 +8,6 @@ import * as DB from "../db";
 import * as Loader from "../elements/loader";
 import * as Notifications from "../elements/notifications";
 import * as ThemeColors from "../elements/theme-colors";
-import { isAuthenticated } from "../firebase";
 import * as quoteRateModal from "../modals/quote-rate";
 import * as GlarsesMode from "../states/glarses-mode";
 import * as SlowTimer from "../states/slow-timer";
@@ -935,7 +934,7 @@ export function updateRateQuote(randomQuote: Quote | null): void {
 function updateQuoteFavorite(randomQuote: Quote | null): void {
   const icon = $(".pageTest #result #favoriteQuoteButton .icon");
 
-  if (Config.mode !== "quote" || !isAuthenticated()) {
+  if (Config.mode !== "quote") {
     icon.parent().addClass("hidden");
     return;
   }
@@ -990,11 +989,7 @@ export async function update(
   $("#words").removeClass("blurred");
   $("#wordsInput").trigger("blur");
   $("#result .stats .time .bottom .afk").text("");
-  if (isAuthenticated()) {
-    $("#result .loginTip").addClass("hidden");
-  } else {
-    $("#result .loginTip").removeClass("hidden");
-  }
+  $("#result .loginTip").addClass("hidden");
   if (Config.ads === "off" || Config.ads === "result") {
     $("#result #watchVideoAdButton").addClass("hidden");
   } else {
@@ -1059,9 +1054,7 @@ export async function update(
     $("main #result .stats").removeClass("hidden");
     $("main #result .chart").removeClass("hidden");
     // $("main #result #resultWordsHistory").removeClass("hidden");
-    if (!isAuthenticated()) {
-      $("main #result .loginTip").removeClass("hidden");
-    }
+    $("main #result .loginTip").removeClass("hidden");
     $("main #result #showWordHistoryButton").removeClass("hidden");
     $("main #result #watchReplayButton").removeClass("hidden");
     $("main #result #saveScreenshotButton").removeClass("hidden");
@@ -1169,12 +1162,9 @@ function updateResultChartDataVisibility(update = false): void {
     $(button).toggleClass("active", vis[id]);
 
     if (id === "pbLine") {
-      $(button).toggleClass("hidden", !isAuthenticated());
+      $(button).toggleClass("hidden", false);
     } else if (id === "tagPbLine") {
-      $(button).toggleClass(
-        "hidden",
-        !isAuthenticated() || !hasTagPbAnnotations
-      );
+      $(button).toggleClass("hidden", !hasTagPbAnnotations);
     }
   }
 }

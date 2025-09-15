@@ -13,7 +13,6 @@ import * as ImportExportSettingsModal from "../modals/import-export-settings";
 import * as ConfigEvent from "../observables/config-event";
 import * as ActivePage from "../states/active-page";
 import { PageWithUrlParams } from "./page";
-import { isAuthenticated } from "../firebase";
 import { get as getTypingSpeedUnit } from "../utils/typing-speed-units";
 import SlimSelect from "slim-select";
 import * as Skeleton from "../utils/skeleton";
@@ -750,7 +749,7 @@ function setActiveFunboxButton(): void {
 }
 
 function refreshTagsSettingsSection(): void {
-  if (isAuthenticated() && DB.getSnapshot()) {
+  if (DB.getSnapshot()) {
     const tagsEl = $(".pageSettings .section.tags .tagsList").empty();
     DB.getSnapshot()?.tags?.forEach((tag) => {
       // let tagPbString = "No PB found";
@@ -787,7 +786,7 @@ function refreshTagsSettingsSection(): void {
 }
 
 function refreshPresetsSettingsSection(): void {
-  if (isAuthenticated() && DB.getSnapshot()) {
+  if (DB.getSnapshot()) {
     const presetsEl = $(".pageSettings .section.presets .presetsList").empty();
     DB.getSnapshot()?.presets?.forEach((preset: SnapshotPreset) => {
       presetsEl.append(`
@@ -941,12 +940,6 @@ export async function update(
     ".pageSettings .section[data-config-name='customBackgroundSize'] input[type='text']",
     Config.customBackground
   );
-
-  if (isAuthenticated()) {
-    showAccountSection();
-  } else {
-    hideAccountSection();
-  }
 
   CustomBackgroundFilter.updateUI();
 

@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { LocalStorageWithSchema } from "./utils/local-storage-with-schema";
-import { activateAnalytics } from "./controllers/analytics-controller";
 import { activateSentry } from "./sentry";
 
 const AcceptedCookiesSchema = z
@@ -33,9 +32,6 @@ const cookies = new LocalStorageWithSchema({
 
 export function activateWhatsAccepted(): void {
   const accepted = getAcceptedCookies();
-  if (accepted?.analytics) {
-    activateAnalytics();
-  }
   if (accepted?.sentry) {
     void activateSentry();
   }

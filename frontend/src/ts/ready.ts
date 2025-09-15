@@ -2,17 +2,14 @@ import * as Misc from "./utils/misc";
 import * as MonkeyPower from "./elements/monkey-power";
 import * as MerchBanner from "./elements/merch-banner";
 import * as ConnectionState from "./states/connection";
-import * as AccountButton from "./elements/account-button";
 //@ts-expect-error no types for this package
 import Konami from "konami";
 import * as ServerConfiguration from "./ape/server-configuration";
 import { getActiveFunboxesWithFunction } from "./test/funbox/list";
 import { loadPromise } from "./config";
-import { authPromise } from "./firebase";
 
 $(async (): Promise<void> => {
   await loadPromise;
-  await authPromise;
 
   //this line goes back to pretty much the beginning of the project and im pretty sure its here
   //to make sure the initial theme application doesnt animate the background color
@@ -28,14 +25,16 @@ $(async (): Promise<void> => {
     .removeClass("hidden")
     .stop(true, true)
     .animate({ opacity: 1 }, Misc.applyReducedMotion(250));
+
+  // Auth removed - hide authentication-related UI elements
+  $(".register").addClass("hidden");
+  $(".login").addClass("hidden");
+  $(".disabledNotification").removeClass("hidden");
+
   if (ConnectionState.get()) {
-    void ServerConfiguration.sync().then(() => {
-      if (!ServerConfiguration.get()?.users.signUp) {
-        AccountButton.hide();
-        $(".register").addClass("hidden");
-        $(".login").addClass("hidden");
-        $(".disabledNotification").removeClass("hidden");
-      }
+    void ServerConfiguration.sync().catch((error: unknown) => {
+      console.warn("Server configuration sync failed:", error);
+      // Continue without server config in no-auth mode
     });
   }
   MonkeyPower.init();

@@ -1,7 +1,6 @@
 import * as PageController from "./page-controller";
 import * as TestUI from "../test/test-ui";
 import * as PageTransition from "../states/page-transition";
-import { isAuthAvailable, isAuthenticated } from "../firebase";
 import { isFunboxActive } from "../test/funbox/list";
 import * as TestState from "../test/test-state";
 import * as Notifications from "../elements/notifications";
@@ -66,12 +65,6 @@ const routes: Route[] = [
     },
   },
   {
-    path: "/leaderboards",
-    load: async (_params, options) => {
-      await PageController.change("leaderboards", options);
-    },
-  },
-  {
     path: "/about",
     load: async (_params, options) => {
       await PageController.change("about", options);
@@ -81,67 +74,6 @@ const routes: Route[] = [
     path: "/settings",
     load: async (_params, options) => {
       await PageController.change("settings", options);
-    },
-  },
-  {
-    path: "/login",
-    load: async (_params, options) => {
-      if (!isAuthAvailable()) {
-        await navigate("/", options);
-        return;
-      }
-      if (isAuthenticated()) {
-        await navigate("/account", options);
-        return;
-      }
-      await PageController.change("login", options);
-    },
-  },
-  {
-    path: "/account",
-    load: async (_params, options) => {
-      if (!isAuthAvailable()) {
-        await navigate("/", options);
-        return;
-      }
-      if (!isAuthenticated()) {
-        await navigate("/login", options);
-        return;
-      }
-      await PageController.change("account", options);
-    },
-  },
-  {
-    path: "/account-settings",
-    load: async (_params, options) => {
-      if (!isAuthAvailable()) {
-        await navigate("/", options);
-        return;
-      }
-      if (!isAuthenticated()) {
-        await navigate("/login", options);
-        return;
-      }
-      await PageController.change("accountSettings", options);
-    },
-  },
-  {
-    path: "/profile",
-    load: async (_params, options) => {
-      await PageController.change("profileSearch", options);
-    },
-  },
-  {
-    path: "/profile/:uidOrName",
-    load: async (params, options) => {
-      await PageController.change("profile", {
-        ...options,
-        force: true,
-        params: {
-          uidOrName: params["uidOrName"] as string,
-        },
-        data: options.data,
-      });
     },
   },
 ];
@@ -194,24 +126,23 @@ export async function navigate(
 }
 
 async function router(options = {} as NavigateOptions): Promise<void> {
-  const matches = routes.map((r) => {
-    return {
-      route: r,
-      result: location.pathname.match(pathToRegex(r.path)),
-    };
-  });
+  const path = window.location.pathname;
+  const potentialMatches = routes.map((route) => ({
+    route,
+    result: path.match(pathToRegex(route.path)),
+  }));
 
-  const match = matches.find((m) => m.result !== null) as {
-    route: Route;
-    result: RegExpMatchArray;
-  };
+  const match = potentialMatches.find((x) => x.result !== null);
 
-  if (match === undefined) {
+  if (match === undefined || match.result === null) {
     await route404.load({}, {});
     return;
   }
 
-  await match.route.load(getParams(match), options);
+  await match.route.load(
+    getParams({ route: match.route, result: match.result }),
+    options
+  );
 }
 
 window.addEventListener("popstate", () => {
@@ -226,4 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
       void navigate(target.href);
     }
   });
+
+  // Initialize router to handle current URL - force initial navigation
+  void router({ force: true });
 });

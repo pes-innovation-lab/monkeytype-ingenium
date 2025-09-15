@@ -4,7 +4,6 @@ import * as ModesNotice from "../../elements/modes-notice";
 import * as TagController from "../../controllers/tag-controller";
 import Config from "../../config";
 import * as PaceCaret from "../../test/pace-caret";
-import { isAuthenticated } from "../../firebase";
 import { Command, CommandsSubgroup } from "../types";
 
 const subgroup: CommandsSubgroup = {
@@ -22,7 +21,7 @@ const commands: Command[] = [
     icon: "fa-tag",
     subgroup,
     available: (): boolean => {
-      return isAuthenticated();
+      return true;
     },
   },
 ];

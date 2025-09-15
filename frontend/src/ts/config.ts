@@ -2,7 +2,6 @@ import * as DB from "./db";
 import * as Notifications from "./elements/notifications";
 import { isConfigValueValid } from "./config-validation";
 import * as ConfigEvent from "./observables/config-event";
-import * as AccountButton from "./elements/account-button";
 import { debounce } from "throttle-debounce";
 import {
   canSetConfigWithCurrentFunboxes,
@@ -49,10 +48,7 @@ let config: Config = {
 let configToSend: Partial<Config> = {};
 const saveToDatabase = debounce(1000, () => {
   if (Object.keys(configToSend).length > 0) {
-    AccountButton.loading(true);
-    void DB.saveConfig(configToSend).then(() => {
-      AccountButton.loading(false);
-    });
+    void DB.saveConfig(configToSend);
   }
   configToSend = {} as Config;
 });
@@ -77,9 +73,7 @@ export function saveFullConfigToLocalStorage(noDbCheck = false): void {
   console.log("saving full config to localStorage");
   configLS.set(config);
   if (!noDbCheck) {
-    AccountButton.loading(true);
     void DB.saveConfig(config);
-    AccountButton.loading(false);
   }
   const stringified = JSON.stringify(config);
   ConfigEvent.dispatch("saveToLocalStorage", stringified);

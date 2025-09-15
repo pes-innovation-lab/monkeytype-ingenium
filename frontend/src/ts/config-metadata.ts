@@ -1,7 +1,6 @@
 import { checkCompatibility } from "@monkeytype/funbox";
 import * as DB from "./db";
 import * as Notifications from "./elements/notifications";
-import { isAuthenticated } from "./firebase";
 import { canSetFunboxWithConfig } from "./test/funbox/funbox-validation";
 import { isDevEnvironment, reloadAfter } from "./utils/misc";
 import * as ConfigSchemas from "@monkeytype/schemas/configs";
@@ -422,16 +421,8 @@ export const configMetadata: ConfigMetadataObject = {
     icon: "fa-i-cursor",
     displayString: "pace caret",
     changeRequiresRestart: false,
-    isBlocked: ({ value }) => {
-      if (document.readyState === "complete") {
-        if ((value === "pb" || value === "tagPb") && !isAuthenticated()) {
-          Notifications.add(
-            `Pace caret "pb" and "tag pb" are unavailable without an account`,
-            0
-          );
-          return true;
-        }
-      }
+    isBlocked: () => {
+      // Always allow pace caret changes
       return false;
     },
   },
@@ -662,13 +653,6 @@ export const configMetadata: ConfigMetadataObject = {
     isBlocked: ({ value }) => {
       if (value === "custom") {
         const snapshot = DB.getSnapshot();
-        if (!isAuthenticated()) {
-          Notifications.add(
-            "Random theme 'custom' is unavailable without an account",
-            0
-          );
-          return true;
-        }
         if (!snapshot) {
           Notifications.add(
             "Random theme 'custom' requires a snapshot to be set",

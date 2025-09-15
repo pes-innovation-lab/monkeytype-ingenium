@@ -28,11 +28,9 @@ import * as TimerProgress from "./timer-progress";
 
 import * as TestTimer from "./test-timer";
 import * as OutOfFocus from "./out-of-focus";
-import * as AccountButton from "../elements/account-button";
 import * as DB from "../db";
 import * as Replay from "./replay";
 import * as TodayTracker from "./today-tracker";
-import * as ChallengeContoller from "../controllers/challenge-controller";
 import * as QuoteRateModal from "../modals/quote-rate";
 import * as Result from "./result";
 import * as MonkeyPower from "../elements/monkey-power";
@@ -48,8 +46,6 @@ import * as TimerEvent from "../observables/timer-event";
 import * as Last10Average from "../elements/last-10-average";
 import * as Monkey from "./monkey";
 import objectHash from "object-hash";
-import * as AnalyticsController from "../controllers/analytics-controller";
-import { getAuthenticatedUser, isAuthenticated } from "../firebase";
 import * as AdController from "../controllers/ad-controller";
 import * as TestConfig from "./test-config";
 import * as ConnectionState from "../states/connection";
@@ -101,12 +97,6 @@ export function setNotSignedInUidAndHash(uid: string): void {
 export function startTest(now: number): boolean {
   if (PageTransition.get()) {
     return false;
-  }
-
-  if (isAuthenticated()) {
-    void AnalyticsController.log("testStarted");
-  } else {
-    void AnalyticsController.log("testStartedNoLogin");
   }
 
   TestState.setActive(true);
@@ -462,7 +452,7 @@ export async function init(): Promise<boolean> {
   }
 
   if (Config.mode === "quote") {
-    if (Config.quoteLength.includes(-3) && !isAuthenticated()) {
+    if (Config.quoteLength.includes(-3)) {
       UpdateConfig.setQuoteLengthAll();
     }
   }
@@ -714,8 +704,6 @@ export async function retrySavingResult(): Promise<void> {
 
   retrySaving.canRetry = false;
   $("#retrySavingResultButton").addClass("hidden");
-
-  AccountButton.loading(true);
 
   Notifications.add("Retrying to save...");
 
@@ -1125,15 +1113,11 @@ export async function finish(difficultyFailed = false): Promise<void> {
   );
   Result.updateTodayTracker();
 
-  if (!isAuthenticated()) {
-    $(".pageTest #result #rateQuoteButton").addClass("hidden");
-    $(".pageTest #result #reportQuoteButton").addClass("hidden");
-    void AnalyticsController.log("testCompletedNoLogin");
-    if (!dontSave) notSignedInLastResult = completedEvent;
-    dontSave = true;
-  } else {
-    $(".pageTest #result #reportQuoteButton").removeClass("hidden");
-  }
+  // No authentication - always treat as not signed in
+  $(".pageTest #result #rateQuoteButton").addClass("hidden");
+  $(".pageTest #result #reportQuoteButton").addClass("hidden");
+  if (!dontSave) notSignedInLastResult = completedEvent;
+  dontSave = true;
 
   $("#result .stats .dailyLeaderboard").addClass("hidden");
 
@@ -1194,34 +1178,11 @@ export async function finish(difficultyFailed = false): Promise<void> {
   }
 
   if (dontSave) {
-    void AnalyticsController.log("testCompletedInvalid");
     return;
   }
 
-  // because of the dont save check above, we know the user is signed in
-  // we check here again so that typescript doesnt complain
-  const user = getAuthenticatedUser();
-  if (!user) {
-    return;
-  }
-
-  // user is logged in
-  TestStats.resetIncomplete();
-
-  completedEvent.uid = user.uid;
-
-  Result.updateRateQuote(TestWords.currentQuote);
-
-  AccountButton.loading(true);
-
-  if (!completedEvent.bailedOut) {
-    const challenge = ChallengeContoller.verify(completedEvent);
-    if (challenge !== null) completedEvent.challenge = challenge;
-  }
-
-  completedEvent.hash = objectHash(completedEvent);
-
-  await saveResult(completedEvent, false);
+  // No authentication - always return early
+  return;
 }
 
 async function saveResult(
@@ -1234,7 +1195,6 @@ async function saveResult(
       customTitle: "Notice",
       important: true,
     });
-    AccountButton.loading(false);
     return;
   }
 
@@ -1244,7 +1204,6 @@ async function saveResult(
       customTitle: "Notice",
       important: true,
     });
-    AccountButton.loading(false);
     retrySaving.canRetry = true;
     $("#retrySavingResultButton").removeClass("hidden");
     if (!isRetrying) {
@@ -1254,8 +1213,6 @@ async function saveResult(
   }
 
   const response = await Ape.results.add({ body: { result: completedEvent } });
-
-  AccountButton.loading(false);
 
   if (response.status !== 200) {
     //only allow retry if status is not in this list
@@ -1322,8 +1279,6 @@ async function saveResult(
         completedEvent.afkDuration
     );
   }
-
-  void AnalyticsController.log("testCompleted");
 
   if (data.isPb !== undefined && data.isPb) {
     //new pb

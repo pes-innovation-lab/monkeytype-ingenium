@@ -1,5 +1,4 @@
 import * as UpdateConfig from "../../config";
-import { isAuthenticated } from "../../firebase";
 import * as DB from "../../db";
 import * as ThemeController from "../../controllers/theme-controller";
 import { Command, CommandsSubgroup } from "../types";
@@ -18,16 +17,12 @@ const commands: Command[] = [
     icon: "fa-palette",
     subgroup,
     available: (): boolean => {
-      return isAuthenticated();
+      return true;
     },
   },
 ];
 
 export function update(): void {
-  if (!isAuthenticated()) {
-    return;
-  }
-
   subgroup.list = [];
 
   const snapshot = DB.getSnapshot();

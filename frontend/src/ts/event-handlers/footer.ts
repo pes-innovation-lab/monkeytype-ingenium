@@ -1,5 +1,4 @@
 import Config, * as UpdateConfig from "../config";
-import { isAuthenticated } from "../firebase";
 import * as DB from "../db";
 import * as Notifications from "../elements/notifications";
 import * as Commandline from "../commandline/commandline";
@@ -55,10 +54,7 @@ document
         UpdateConfig.setCustomTheme(false);
         return;
       }
-      if (
-        isAuthenticated() &&
-        (DB.getSnapshot()?.customThemes?.length ?? 0) < 1
-      ) {
+      if ((DB.getSnapshot()?.customThemes?.length ?? 0) < 1) {
         Notifications.add("No custom themes!", 0);
         UpdateConfig.setCustomTheme(false);
         return;

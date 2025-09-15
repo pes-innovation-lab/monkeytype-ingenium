@@ -1,7 +1,6 @@
 import * as Focus from "../test/focus";
 import * as CommandlineLists from "./lists";
 import Config from "../config";
-import * as AnalyticsController from "../controllers/analytics-controller";
 import * as ThemeController from "../controllers/theme-controller";
 import { clearFontPreview } from "../ui";
 import AnimatedModal, { ShowOptions } from "../utils/animated-modal";
@@ -612,9 +611,6 @@ function handleInputSubmit(): void {
     });
   }
 
-  void AnalyticsController.log("usedCommandLine", {
-    command: inputModeParams.command.id,
-  });
   hide();
 }
 
@@ -650,7 +646,6 @@ async function runActiveCommand(): Promise<void> {
     }
     const isSticky = command.sticky ?? false;
     if (!isSticky) {
-      void AnalyticsController.log("usedCommandLine", { command: command.id });
       if (!command.opensModal) {
         hide(true);
       }

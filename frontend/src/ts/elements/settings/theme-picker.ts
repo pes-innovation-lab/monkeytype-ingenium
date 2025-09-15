@@ -8,7 +8,6 @@ import * as ChartController from "../../controllers/chart-controller";
 import * as Loader from "../loader";
 import * as DB from "../../db";
 import * as ConfigEvent from "../../observables/config-event";
-import { isAuthenticated } from "../../firebase";
 import * as ActivePage from "../../states/active-page";
 import { CustomThemeColors, ThemeName } from "@monkeytype/schemas/configs";
 import { captureException } from "../../sentry";
@@ -221,37 +220,10 @@ export async function fillCustomButtons(): Promise<void> {
     ".pageSettings .section.themes .customThemeEdit #saveCustomThemeButton"
   );
 
-  if (!isAuthenticated()) {
-    saveButton.text("save");
-    addButton.addClass("hidden");
-    customThemesEl.css("margin-bottom", "0");
-    return;
-  }
-
-  saveButton.text("save as new");
-  addButton.removeClass("hidden");
-
-  const customThemes = DB.getSnapshot()?.customThemes ?? [];
-
-  if (customThemes.length === 0) {
-    customThemesEl.css("margin-bottom", "0");
-  } else {
-    customThemesEl.css("margin-bottom", "1rem");
-  }
-
-  for (const customTheme of customThemes) {
-    const bgColor = customTheme.colors[0];
-    const mainColor = customTheme.colors[1];
-
-    customThemesEl.append(
-      `<div class="customTheme button" customThemeId='${customTheme._id}' 
-      style="color:${mainColor};background:${bgColor}">
-      <div class="editButton"><i class="fas fa-pen"></i></div>
-      <div class="text">${customTheme.name.replace(/_/g, " ")}</div>
-      <div class="delButton"><i class="fas fa-trash fa-fw"></i></div>
-      </div>`
-    );
-  }
+  // Authentication removed - only local themes supported
+  saveButton.text("save");
+  addButton.addClass("hidden");
+  customThemesEl.css("margin-bottom", "0");
 }
 
 export function setCustomInputs(noThemeUpdate = false): void {
@@ -467,16 +439,15 @@ $(".pageSettings #loadCustomColorsFromPreset").on("click", async () => {
 
 $(".pageSettings #saveCustomThemeButton").on("click", async () => {
   saveCustomThemeColors();
-  if (isAuthenticated()) {
-    const newCustomTheme = {
-      name: "custom",
-      colors: Config.customThemeColors,
-    };
+  // Save custom theme to database
+  const newCustomTheme = {
+    name: "custom",
+    colors: Config.customThemeColors,
+  };
 
-    Loader.show();
-    await DB.addCustomTheme(newCustomTheme);
-    Loader.hide();
-  }
+  Loader.show();
+  await DB.addCustomTheme(newCustomTheme);
+  Loader.hide();
   void fillCustomButtons();
 });
 

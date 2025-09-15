@@ -797,7 +797,6 @@ async function handleTab(
     if (modalVisible) return;
 
     // dont do anything on login so we can tab/esc between inputs
-    if (ActivePage.get() === "login") return;
 
     event.preventDefault();
     // insert tab character if needed (only during the test)
@@ -811,7 +810,6 @@ async function handleTab(
     if (modalVisible) return;
 
     // dont do anything on login so we can tab/esc betweeen inputs
-    if (ActivePage.get() === "login") return;
 
     // change page if not on test page
     if (ActivePage.get() !== "test") {

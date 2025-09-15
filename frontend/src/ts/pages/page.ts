@@ -4,18 +4,7 @@ import {
   serialize as serializeUrlSearchParams,
 } from "zod-urlsearchparams";
 
-export type PageName =
-  | "loading"
-  | "test"
-  | "settings"
-  | "about"
-  | "account"
-  | "login"
-  | "profile"
-  | "profileSearch"
-  | "404"
-  | "accountSettings"
-  | "leaderboards";
+export type PageName = "loading" | "test" | "settings" | "about" | "404";
 
 type Options<T> = {
   params?: Record<string, string>;

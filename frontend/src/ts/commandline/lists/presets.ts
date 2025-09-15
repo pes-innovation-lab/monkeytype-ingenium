@@ -3,7 +3,6 @@ import * as ModesNotice from "../../elements/modes-notice";
 import * as Settings from "../../pages/settings";
 import * as PresetController from "../../controllers/preset-controller";
 import * as EditPresetPopup from "../../modals/edit-preset";
-import { isAuthenticated } from "../../firebase";
 import { Command, CommandsSubgroup } from "../types";
 
 const subgroup: CommandsSubgroup = {
@@ -22,7 +21,7 @@ const commands: Command[] = [
     icon: "fa-sliders-h",
     subgroup,
     available: (): boolean => {
-      return isAuthenticated();
+      return true;
     },
   },
 ];
