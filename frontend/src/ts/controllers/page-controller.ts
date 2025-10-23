@@ -106,7 +106,6 @@ async function showLoading({
 
   await PageLoading.page.afterHide();
   PageLoading.page.element.addClass("hidden");
-  console.log("PAGE_CONTROLLER: Loading page hidden");
 }
 
 async function getLoadingPromiseWithBarKeyframes(
@@ -152,7 +151,6 @@ export async function change(
   pageName: PageName,
   options = {} as ChangeOptions
 ): Promise<boolean> {
-  console.log("PAGE_CONTROLLER: change() called with page:", pageName);
   const defaultOptions = {
     force: false,
   };
@@ -267,6 +265,5 @@ export async function change(
   //wrapup
   PageTransition.set(false);
   void AdController.reinstate();
-  console.log("PAGE_CONTROLLER: Page change complete for:", pageName);
   return true;
 }

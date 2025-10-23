@@ -6,7 +6,7 @@ import * as ConfigEvent from "./observables/config-event";
 import { debounce, throttle } from "throttle-debounce";
 import * as TestUI from "./test/test-ui";
 import { get as getActivePage } from "./states/active-page";
-import { isDevEnvironment } from "./utils/misc";
+//import { isDevEnvironment } from "./utils/misc";
 import { isCustomTextLong } from "./states/custom-text-name";
 import { canQuickRestart } from "./utils/quick-restart";
 import { FontName } from "@monkeytype/schemas/fonts";
@@ -55,14 +55,6 @@ function updateKeytips(): void {
         : `<key>${Config.quickRestart}</key>`
     } - restart test<br>
     <key>${commandKey}</key> or <key>${modifierKey}</key>+<key>shift</key>+<key>p</key> - command line`);
-}
-
-if (isDevEnvironment()) {
-  $("header #logo .top").text("localhost");
-  $("head title").text($("head title").text() + " (localhost)");
-  $("body").append(
-    `<div class="devIndicator tl">local</div><div class="devIndicator br">local</div>`
-  );
 }
 
 //stop space scrolling

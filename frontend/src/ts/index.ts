@@ -70,17 +70,14 @@ function addToGlobal(items: Record<string, unknown>): void {
 }
 
 void loadFromLocalStorage().then(() => {
-  console.log("CONFIG: loadFromLocalStorage completed");
   // Initialize auth state as not signed in (auth removed) - after config loads
   void import("./observables/auth-event").then((AuthEvent) => {
-    console.log("AUTH: Dispatching authStateChanged event");
     AuthEvent.dispatch({
       type: "authStateChanged",
       data: { isUserSignedIn: false },
     });
   });
   // Initialize default snapshot for no-auth mode
-  console.log("DB: Initializing default snapshot");
   DB.initDefaultSnapshot();
 });
 void VersionButton.update();

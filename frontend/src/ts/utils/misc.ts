@@ -606,13 +606,10 @@ export function reloadAfter(seconds: number): void {
 }
 
 export function updateTitle(title?: string): void {
-  const local = isDevEnvironment() ? "localhost - " : "";
-
   if (title === undefined || title === "") {
-    document.title =
-      local + "Monkeytype | A minimalistic, customizable typing test";
+    document.title = "Typeshift";
   } else {
-    document.title = local + title;
+    document.title = title;
   }
 }
 
