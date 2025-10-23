@@ -840,6 +840,7 @@ function buildCompletedEvent(
     testDuration: duration,
     afkDuration: afkDuration,
     stopOnLetter: Config.stopOnError === "letter",
+    username: ($("#localUsername").val() as string) || undefined,
   };
 
   if (completedEvent.mode !== "custom") delete completedEvent.customText;
@@ -1236,6 +1237,16 @@ async function saveResult(
     }
     Notifications.add("Failed to save result: " + response.body.message, -1);
     return;
+  }
+
+  // Also save to local results if username is provided
+  if (completedEvent.username !== null && completedEvent.username !== "") {
+    try {
+      await Ape.localResults.add({ body: { result: completedEvent } });
+    } catch (error) {
+      console.log("Error saving local result", error);
+      // Don't show error notification for local results failure
+    }
   }
 
   const data = response.body.data;

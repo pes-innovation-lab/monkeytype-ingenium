@@ -51,6 +51,7 @@ export function buildDbResult(
     bailedOut: ce.bailedOut,
     blindMode: ce.blindMode,
     name: userName,
+    username: ce.username,
   };
 
   //compress object by omitting default values. Frontend will add them back after reading

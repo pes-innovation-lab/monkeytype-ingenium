@@ -1,6 +1,19 @@
 <div class="page pageTest hidden full-width content-grid" data-nosnippet>
   <div id="testConfig" class="full-width">
     <div class="row">
+      <div class="usernameInput">
+        <label for="localUsername">Username:</label>
+        <input
+          id="localUsername"
+          type="text"
+          placeholder="Enter your username"
+          maxlength="20"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="spacer leftSpacer"></div>
+
       <div class="puncAndNum">
         <button class="textButton punctuationMode">
           <i class="fas fa-fw fa-at"></i>
@@ -244,6 +257,10 @@
           </div>
         </div>
         <!-- <div class="group infoAndTags"> -->
+        <div class="group username hidden">
+          <div class="top">username</div>
+          <div class="bottom">-</div>
+        </div>
         <div class="group info">
           <div class="top">other</div>
           <div class="bottom">-</div>

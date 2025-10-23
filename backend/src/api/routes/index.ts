@@ -37,6 +37,7 @@ import { rateLimitRequest } from "../../middlewares/rate-limit";
 import { verifyPermissions } from "../../middlewares/permission";
 import { verifyRequiredConfiguration } from "../../middlewares/configuration";
 import { ExpressRequestWithContext } from "../types";
+import localResults from "./local-results";
 
 const pathOverride = process.env["API_PATH_OVERRIDE"];
 const BASE_ROUTE = pathOverride !== undefined ? `/${pathOverride}` : "";
@@ -55,6 +56,7 @@ const router = s.router(contract, {
   psas,
   public: publicStats,
   leaderboards,
+  localResults,
   results,
   configuration,
   dev,

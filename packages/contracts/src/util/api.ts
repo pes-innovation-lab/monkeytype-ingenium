@@ -10,6 +10,7 @@ export type OpenApiTag =
   | "psas"
   | "public"
   | "leaderboards"
+  | "local-results"
   | "results"
   | "configuration"
   | "development"

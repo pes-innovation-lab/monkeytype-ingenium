@@ -93,6 +93,7 @@ export const ResultSchema = ResultBaseSchema.extend({
   keySpacingStats: KeyStatsSchema.optional(),
   keyDurationStats: KeyStatsSchema.optional(),
   name: z.string(),
+  username: z.string().max(20).optional(),
   isPb: z.boolean().optional(), //true or undefined
 });
 
@@ -139,6 +140,7 @@ export const CompletedEventSchema = ResultBaseSchema.required({
     wpmConsistency: PercentageSchema,
     stopOnLetter: z.boolean(),
     incompleteTests: z.array(IncompleteTestSchema),
+    username: z.string().max(20).optional(),
   })
   .strict();
 

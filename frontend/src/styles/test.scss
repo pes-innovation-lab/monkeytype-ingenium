@@ -1124,7 +1124,8 @@
       }
 
       .testType,
-      .leaderboards {
+      .leaderboards,
+      .username {
         .bottom {
           font-size: 1rem;
           line-height: 1.25;
@@ -1256,13 +1257,46 @@
     // overflow: hidden;
     opacity: 1;
   }
-  .row {
+  .usernameInput {
     display: flex;
-    // padding: 0 0.5rem;
+    align-items: center;
+    gap: 0.5rem;
+    padding: var(--verticalPadding) var(--horizontalPadding);
     background: var(--sub-alt-color);
     border-radius: var(--roundness);
-    z-index: 2;
-    // width: max-content;
+    transition: background 0.125s;
+
+    &:hover {
+      background: var(--sub-color);
+    }
+
+    label {
+      font-size: 0.75rem;
+      color: var(--text-color);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    input {
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 0;
+      font-size: 0.75rem;
+      color: var(--text-color);
+      min-width: 100px;
+      max-width: 150px;
+
+      &::placeholder {
+        color: var(--sub-color);
+      }
+
+      &:focus {
+        &::placeholder {
+          opacity: 0.5;
+        }
+      }
+    }
   }
   .spacer {
     height: auto;

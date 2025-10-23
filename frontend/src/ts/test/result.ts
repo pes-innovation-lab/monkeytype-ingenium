@@ -839,6 +839,16 @@ function updateTestType(randomQuote: Quote | null): void {
   $("#result .stats .testType .bottom").html(testType);
 }
 
+function updateUsername(): void {
+  const username = result.username;
+  if (username !== null && username !== "") {
+    $("#result .stats .username").removeClass("hidden");
+    $("#result .stats .username .bottom").html(username);
+  } else {
+    $("#result .stats .username").addClass("hidden");
+  }
+}
+
 function updateOther(
   difficultyFailed: boolean,
   failReason: string,
@@ -1000,6 +1010,7 @@ export async function update(
   updateTime();
   updateKey();
   updateTestType(randomQuote);
+  updateUsername();
   updateQuoteSource(randomQuote);
   updateQuoteFavorite(randomQuote);
   await updateCrown(dontSave);

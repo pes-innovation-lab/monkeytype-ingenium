@@ -7,5 +7,5 @@ mongodb instance :
 
 leaderboard page : 
 - should have a handler to get usernames 
-- display leaderboard locally 
+- display leaderboard locally instead of the global db 
 

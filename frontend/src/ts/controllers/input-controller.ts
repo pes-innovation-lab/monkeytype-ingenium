@@ -901,6 +901,7 @@ $(document).on("keydown", async (event) => {
 
   //autofocus
   const wordsFocused: boolean = $("#wordsInput").is(":focus");
+  const usernameFocused: boolean = $("#localUsername").is(":focus");
   const pageTestActive: boolean = ActivePage.get() === "test";
   const commandLineVisible = Misc.isPopupVisible("commandLineWrapper");
   const leaderboardsVisible = Misc.isPopupVisible("leaderboardsWrapper");
@@ -913,12 +914,13 @@ $(document).on("keydown", async (event) => {
     !leaderboardsVisible &&
     !popupVisible &&
     !TestUI.resultVisible &&
-    (wordsFocused || event.key !== "Enter") &&
+    (wordsFocused || usernameFocused || event.key !== "Enter") &&
     !awaitingNextWord;
 
   if (
     allowTyping &&
     !wordsFocused &&
+    !usernameFocused &&
     !["Enter", " ", "Escape", "Tab", ...ModifierKeys].includes(event.key)
   ) {
     TestUI.focusWords();
