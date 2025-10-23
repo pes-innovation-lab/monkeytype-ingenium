@@ -841,7 +841,7 @@ function updateTestType(randomQuote: Quote | null): void {
 
 function updateUsername(): void {
   const username = result.username;
-  if (username !== null && username !== "") {
+  if (username !== null && username !== undefined && username !== "") {
     $("#result .stats .username").removeClass("hidden");
     $("#result .stats .username .bottom").html(username);
   } else {
