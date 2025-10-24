@@ -56,10 +56,17 @@ function updateTable(entries: LocalLeaderboardEntry[]): void {
 
   (tbody as HTMLElement).innerHTML = "";
 
-  entries.forEach((entry, index) => {
+  // Show the correct table header for local leaderboard
+  const allTimeHead = lb?.querySelector("thead.allTimeAndDaily");
+  const weeklyHead = lb?.querySelector("thead.weekly");
+  if (allTimeHead)
+    (allTimeHead as HTMLElement).style.display = "table-header-group";
+  if (weeklyHead) (weeklyHead as HTMLElement).style.display = "none";
+
+  entries.forEach((entry) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${currentPage * 50 + index + 1}</td>
+      <td>${entry.rank}</td>
       <td>
         <div class="avatarNameBadge">
           <div class="avatar">
@@ -90,8 +97,9 @@ async function loadLocalLeaderboard(page = 0): Promise<void> {
     showLoading();
     hideError();
 
+    const skip = page * 50;
     const response = await Ape.localResults.getLeaderboard({
-      query: { limit: 50 },
+      query: { limit: 50, skip },
     });
 
     if (response.status !== 200) {
@@ -112,6 +120,8 @@ async function loadLocalLeaderboard(page = 0): Promise<void> {
     hideLoading();
   }
 }
+
+export { loadLocalLeaderboard };
 
 function updatePaginationButtons(hasMore: boolean): void {
   const prevBtn = lb?.querySelector("button[data-action='previousPage']");
@@ -193,6 +203,18 @@ for (const button of lb?.querySelectorAll(".jumpButtons button[data-action]") ??
 
 // Initialize when page becomes visible
 if (lb) {
+  // Load leaderboard if page is already visible
+  if (!lb.classList.contains("hidden")) {
+    void loadLocalLeaderboard(0);
+  } else {
+    // Check again after a short delay in case the page becomes visible
+    setTimeout(() => {
+      if (lb !== null && !lb.classList.contains("hidden")) {
+        void loadLocalLeaderboard(0);
+      }
+    }, 100);
+  }
+
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       if (
@@ -202,9 +224,10 @@ if (lb) {
         const target = mutation.target as HTMLElement;
         if (
           !target.classList.contains("hidden") &&
+          target.classList.contains("active") &&
           target.id === "pageLeaderboards"
         ) {
-          // Page became visible, load leaderboard
+          // Page became visible and active, load leaderboard
           void loadLocalLeaderboard(0);
         }
       }
@@ -214,5 +237,13 @@ if (lb) {
   observer.observe(lb, {
     attributes: true,
     attributeFilter: ["class"],
+  });
+} else {
+  // If element not found, try again after DOM is ready
+  document.addEventListener("DOMContentLoaded", () => {
+    const lbElement = document.getElementById("pageLeaderboards");
+    if (lbElement !== null && !lbElement.classList.contains("hidden")) {
+      void loadLocalLeaderboard(0);
+    }
   });
 }

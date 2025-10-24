@@ -10,29 +10,27 @@ export const getLocalResultsCollection = (): Collection<DBLocalResult> =>
   db.collection<DBLocalResult>("localResults");
 
 export async function addLocalResult(result: DBLocalResult): Promise<void> {
-  // Check if user already has a result with same configuration
-  const existingResult = await getLocalResultsCollection().findOne({
-    username: result.username,
-    mode: result.mode,
-    mode2: result.mode2,
-    punctuation: result.punctuation,
-    numbers: result.numbers,
-    language: result.language,
-    difficulty: result.difficulty,
-    lazyMode: result.lazyMode,
-  });
+  // Check if user already has any result
+  const existingUserResults = await getLocalResultsCollection()
+    .find({ username: result.username })
+    .sort({ wpm: -1 })
+    .limit(1)
+    .toArray();
 
-  if (existingResult) {
-    // Only update if new WPM is higher
-    if (result.wpm > existingResult.wpm) {
+  if (existingUserResults.length > 0) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const bestResult = existingUserResults[0]!;
+    // Only update if new WPM is higher than the user's current best
+    if (result.wpm > bestResult.wpm) {
+      const { _id, ...updateData } = result;
       await getLocalResultsCollection().updateOne(
-        { _id: existingResult._id },
-        { $set: result }
+        { _id: bestResult._id },
+        { $set: updateData }
       );
     }
     // If WPM is not higher, don't update
   } else {
-    // No existing result, insert new one
+    // No existing result for user, insert new one
     await getLocalResultsCollection().insertOne(result);
   }
 }
@@ -61,11 +59,13 @@ export async function getLocalResults(
 }
 
 export async function getLocalLeaderboard(
-  limit: number = 50
+  limit: number = 50,
+  skip: number = 0
 ): Promise<DBLocalResult[]> {
   return await getLocalResultsCollection()
     .find({})
     .sort({ wpm: -1, timestamp: -1 })
+    .skip(skip)
     .limit(limit)
     .toArray();
 }

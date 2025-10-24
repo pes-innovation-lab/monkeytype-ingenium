@@ -5,6 +5,7 @@ import { MonkeyRequest } from "../types";
 import {
   AddLocalResultRequest,
   GetLocalLeaderboardQuery,
+  LocalLeaderboardEntry,
 } from "@monkeytype/contracts/local-results";
 
 export async function addLocalResult(
@@ -36,14 +37,14 @@ export async function addLocalResult(
 
 export async function getLocalLeaderboard(
   req: MonkeyRequest<GetLocalLeaderboardQuery>
-): Promise<MonkeyResponse<{ entries: unknown[] }>> {
-  const { limit = 50 } = req.query;
+): Promise<MonkeyResponse<{ entries: LocalLeaderboardEntry[] }>> {
+  const { limit = 50, skip = 0 } = req.query;
 
-  const results = await LocalResultsDAL.getLocalLeaderboard(limit);
+  const results = await LocalResultsDAL.getLocalLeaderboard(limit, skip);
 
   return new MonkeyResponse("Local leaderboard retrieved", {
     entries: results.map((r, index) => ({
-      rank: index + 1,
+      rank: skip + index + 1,
       username: r.username,
       wpm: r.wpm,
       accuracy: r.acc,
@@ -54,9 +55,9 @@ export async function getLocalLeaderboard(
   });
 }
 
-export async function getLocalUsernames(): Promise<
-  MonkeyResponse<{ usernames: string[] }>
-> {
+export async function getLocalUsernames(
+  _req: MonkeyRequest<Record<string, never>>
+): Promise<MonkeyResponse<{ usernames: string[] }>> {
   const usernames = await LocalResultsDAL.getLocalUsernames();
 
   return new MonkeyResponse("Local usernames retrieved", {

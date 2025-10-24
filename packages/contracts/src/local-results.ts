@@ -42,6 +42,7 @@ export type AddLocalResultResponse = z.infer<
 
 const GetLocalLeaderboardQuerySchema = z.object({
   limit: z.number().int().positive().max(100).default(50),
+  skip: z.number().int().nonnegative().default(0),
 });
 
 export type GetLocalLeaderboardQuery = z.infer<
@@ -89,7 +90,7 @@ export const localResultsContract = c.router(
       summary: "get local leaderboard",
       description: "Get local leaderboard results.",
       method: "GET",
-      path: "/leaderboard",
+      path: "/leaderboards",
       query: GetLocalLeaderboardQuerySchema.strict(),
       responses: {
         200: GetLocalLeaderboardResponseSchema,
@@ -104,6 +105,7 @@ export const localResultsContract = c.router(
       description: "Get all usernames that have submitted local results.",
       method: "GET",
       path: "/usernames",
+      query: z.object({}).strict(),
       responses: {
         200: GetLocalUsernamesResponseSchema,
         404: MonkeyClientError,

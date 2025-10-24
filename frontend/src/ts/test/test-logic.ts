@@ -1114,6 +1114,24 @@ export async function finish(difficultyFailed = false): Promise<void> {
   );
   Result.updateTodayTracker();
 
+  // Save to local results if username is provided and test is valid
+  if (
+    !dontSave &&
+    completedEvent.username !== null &&
+    completedEvent.username !== ""
+  ) {
+    // Set uid and hash for local results
+    completedEvent.uid = "local";
+    completedEvent.hash = objectHash(completedEvent);
+
+    try {
+      await Ape.localResults.add({ body: { result: completedEvent } });
+    } catch (error) {
+      console.log("Error saving local result", error);
+      Notifications.add("Failed to save local result", -1, { duration: 3 });
+    }
+  }
+
   // No authentication - always treat as not signed in
   $(".pageTest #result #rateQuoteButton").addClass("hidden");
   $(".pageTest #result #reportQuoteButton").addClass("hidden");
@@ -1237,16 +1255,6 @@ async function saveResult(
     }
     Notifications.add("Failed to save result: " + response.body.message, -1);
     return;
-  }
-
-  // Also save to local results if username is provided
-  if (completedEvent.username !== null && completedEvent.username !== "") {
-    try {
-      await Ape.localResults.add({ body: { result: completedEvent } });
-    } catch (error) {
-      console.log("Error saving local result", error);
-      // Don't show error notification for local results failure
-    }
   }
 
   const data = response.body.data;

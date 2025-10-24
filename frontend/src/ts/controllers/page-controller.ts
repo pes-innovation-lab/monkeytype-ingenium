@@ -6,6 +6,7 @@ import * as PageTest from "../pages/test";
 import * as PageAbout from "../pages/about";
 import * as PageLoading from "../pages/loading";
 import * as Page404 from "../pages/404";
+import * as PageLeaderboards from "../pages/leaderboards";
 import * as PageTransition from "../states/page-transition";
 import * as AdController from "../controllers/ad-controller";
 import * as Focus from "../test/focus";
@@ -40,7 +41,7 @@ function updateTitle(nextPage: { id: string; display?: string }): void {
   } else {
     const titleString =
       nextPage.display ?? Strings.capitalizeFirstLetterOfEachWord(nextPage.id);
-    Misc.updateTitle(`${titleString} | Monkeytype`);
+    Misc.updateTitle(`${titleString} | Typeshift`);
   }
 }
 
@@ -176,6 +177,7 @@ export async function change(
     test: PageTest.page,
     settings: Settings.page,
     about: PageAbout.page,
+    leaderboards: PageLeaderboards.page,
     404: Page404.page,
   };
 
