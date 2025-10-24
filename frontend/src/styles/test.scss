@@ -1374,7 +1374,19 @@
     }
   }
 }
-
+#testConfig .quoteLength {
+  padding-left: 0em; /* Adjust value as needed */
+  padding-right: 3em; /* Remove if you don't want extra right padding */
+}
+#testConfig .wordCount {
+  padding-right: 8em;
+}
+#testConfig .time {
+  padding-right: 8em;
+}
+#testConfig .customText {
+  padding-right: 14em;
+}
 .pageTest {
   height: 100%;
   display: grid;
@@ -1450,6 +1462,7 @@
 
     .textButton {
       padding: 0.5em 1em;
+      padding-left: 1em;
       &.noInteraction {
         pointer-events: none;
       }
