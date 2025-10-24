@@ -840,7 +840,7 @@ function buildCompletedEvent(
     testDuration: duration,
     afkDuration: afkDuration,
     stopOnLetter: Config.stopOnError === "letter",
-    username: ($("#localUsername").val() as string) || undefined,
+    username: ($("#localUsername").val() as string) || "",
   };
 
   if (completedEvent.mode !== "custom") delete completedEvent.customText;
@@ -973,6 +973,16 @@ export async function finish(difficultyFailed = false): Promise<void> {
   const completedEvent = structuredClone(ce) as CompletedEvent;
 
   ///////// completed event ready
+
+  // Check if username is missing for leaderboard save
+  if (
+    completedEvent.username === undefined ||
+    completedEvent.username.trim() === ""
+  ) {
+    Notifications.add("You need a username to save on leaderboard", 0, {
+      duration: 5,
+    });
+  }
 
   //afk check
   const kps = TestInput.afkHistory.slice(-5);
@@ -1135,7 +1145,8 @@ export async function finish(difficultyFailed = false): Promise<void> {
   // No authentication - always treat as not signed in
   $(".pageTest #result #rateQuoteButton").addClass("hidden");
   $(".pageTest #result #reportQuoteButton").addClass("hidden");
-  if (!dontSave) notSignedInLastResult = completedEvent;
+  if (!dontSave && completedEvent.username !== undefined)
+    notSignedInLastResult = completedEvent;
   dontSave = true;
 
   $("#result .stats .dailyLeaderboard").addClass("hidden");
